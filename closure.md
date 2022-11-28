@@ -1,0 +1,109 @@
+# 호이스팅(Hoisting)
+
+> 인터프리터가 변수와 함수를 선언 전에 메모리 공간을 미리 할당하는 것
+
+- 아래에 선언된 변수와 함수가 코드 최상단에 위치하는 것처럼 동작. (실제로 코드가 끌어올려지는 건 아니다.)
+- **선언**만 위로 끌어올려지며, **초기화, 할당**은 끌어올려지지 않는다. (= var와 함수 선언문만 호이스팅이 유효한 이유)
+
+```
+console.log(name);
+
+var name = 'Mike';
+```
+
+위의 코드는 에러를 출력하지 않는다. 변수의 선언은 호이스팅 되기 때문이다.
+따라서 위의 코드는 다음과 같이 동작한다.
+
+```
+var name;
+
+console.log(name); // undefined
+
+name = 'Mike';
+```
+
+호이스팅은 **선언**만 끌어올려지고, 초기화와 할당은 끌어올려지지 않는다.
+그럼에도 name이 undefined로 출력되는 이유는, var의 경우 할당 전에 호출하면 자동으로 undefined로 초기화해주기 때문이다.
+
+호이스팅은 스코프 내부 어디서든 변수 선언은 최상위에 선언된 것처럼 행동해주기 때문에, 사실상 let과 const도 호이스팅 된다고 할 수 있다.
+다만 let과 const의 경우 var처럼 자동으로 초기화해주지 않기 때문에, 호이스팅 되어도 사용할 수 없는 것이다.
+이게 ES6에서 var대신 let과 const 사용을 권장하는 이유이며, 이는 코드를 예측 가능하게 하고, 잠재적인 버그를 줄일 수 있다.
+
+같은 이유로 함수 표현식에서는 선언과 할당이 분리돼서 이뤄지기 때문에, 함수 선언문은 호이스팅 되지만 함수 선언문은 호이스팅되지 않는다.
+
+# 클로저(Closure)
+
+- JS는 정적 스코프(static scope)를 채택한다. 이는 함수가 정의되는 위치에 따라 참조할 수 있는 변수의 유효 범위가 달라지는 것을 의미하며, 어휘적 환경(lexical environment)라고도 한다.
+  - 함수를 호출하는 위치에 따라 참조할 수 있는 변수의 유효 범위가 달라지는 것은 동적 스코프(dynamic scope)라고 한다.
+
+다음과 같은 코드가 있을 때
+
+```
+function makeAdder(x) {
+    return function(y) {
+        return x + y;
+    }
+}
+
+const add3 = makeAdder(3);
+console.log(add3(2));
+```
+
+1. 최초 실행 시 호이스팅에 의해 전역 Lexical 환경은 다음과 같아진다.
+
+```
+// 전역 lexical 환경
+makeAdder : function
+add3 : 초기화x(사용 불가능한 상태)
+```
+
+2. const add3 = makeAdder(3); 구문이 실행될 때 makeAdder 함수가 실행되고 makeAdder Lexical 환경이 만들어진다.
+   함수의 lexical 환경에는 넘겨받은 매개변수와 지역변수들이 저장된다. 따라서 이곳에 전달받은 x의 값이 들어간다.
+
+```
+// makeAdder lexical 환경
+x : 3
+```
+
+동시에 전역 lexical 환경에서 add3의 값은 makeAdder가 return한 익명 함수가 들어간다.
+
+```
+// 전역 lexical 환경
+makeAdder : function
+add3 : function
+```
+
+3. 코드의 마지막 줄인 console.log(add3(2)); 를 실행하면 add3에 할당된 익명함수가 실행되면서 익명함수 lexical 환경이 만들어진다.
+   동시에 y는 2로 초기화된다.
+
+```
+// 익명함수 lexical 환경
+y : 2
+```
+
+이제, x + y를 실행시키기 위해 변수를 찾는다. 이때, 익명함수의 lexical 환경은 makeAdder 환경을 **참조**하고 있고, makeAdder는 전역 lexical환경을 참조하고 있다.
+따라서 익명함수의 lexical환경에서 y를 찾고, x를 찾지 못했다면 참조하고 있는 상위 lexical 환경에서 이 값을 찾는다.
+따라서 console.log(add3(2));는 5를 출력한다.
+
+이처럼 함수가 생성될 당시의 외부 변수를 기억하고, 생성 이후에도 계속 접근이 가능하도록 함수와 함수가 선언된 lexical 환경의 조합한 것을 closure라고 한다.
+
+closure는 위의 예제에서 본 것처럼 외부 변수에 대한 **참조**를 저장하고 있기 때문에 이 값들에 대해 읽고 갱신할 수 있다.
+
+```
+function makeCounter() {
+    let num = 0;
+    return function () {
+        return num++;
+    }
+}
+
+let counter = makeCounter();
+
+console.log(counter()); // 0
+console.log(counter()); // 1
+console.log(counter()); // 2
+```
+
+이 예제에서 makeCounter는 let counter에 익명함수를 return해주고 끝이 났다. 그렇지만 클로저에 의해 익명함수 외부 변수인 num값의 참조를 가지고 있기 때문에 이 값을 계속 읽고, 갱신할 수 있다.
+
+이처럼 클로저는 자신을 생성한 함수보다 더 오래 지속될 수 있다.
