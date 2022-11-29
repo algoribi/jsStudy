@@ -59,7 +59,7 @@ makeAdder : function
 add3 : 초기화x(사용 불가능한 상태)
 ```
 
-2. let add3 = makeAdder(3); 구문이 실행될 때 makeAdder 함수가 실행되고 makeAdder Lexical 환경이 만들어진다.
+2. let add3 = makeAdder(3); 구문이 실행될 때 makeAdder 함수가 실행되고 makeAdder Lexical 환경이 만들어진다.<br />
    함수의 lexical 환경에는 넘겨받은 매개변수와 지역변수들이 저장된다. 따라서 이곳에 전달받은 x의 값이 들어간다.
 
 ```
@@ -75,7 +75,7 @@ makeAdder : function
 add3 : function
 ```
 
-3. 코드의 마지막 줄인 console.log(add3(2)); 를 실행하면 add3에 할당된 익명함수가 실행되면서 익명함수 lexical 환경이 만들어진다.
+3. 코드의 마지막 줄인 console.log(add3(2)); 를 실행하면 add3에 할당된 익명함수가 실행되면서 익명함수 lexical 환경이 만들어진다.<br />
    동시에 y는 2로 초기화된다.
 
 ```
@@ -83,9 +83,10 @@ add3 : function
 y : 2
 ```
 
-이제, x + y를 실행시키기 위해 변수를 찾는다. 이때, 익명함수의 lexical 환경은 makeAdder 환경을 **참조**하고 있고, makeAdder는 전역 lexical환경을 참조하고 있다.
-따라서 익명함수의 lexical환경에서 y를 찾고, x를 찾지 못했다면 참조하고 있는 상위 lexical 환경에서 이 값을 찾는다.
-따라서 console.log(add3(2));는 5를 출력한다.
+이제, x + y를 실행시키기 위해 변수를 찾는다. <br />
+이때, 익명함수의 lexical 환경은 makeAdder 환경을 **참조**하고 있고, makeAdder는 전역 lexical환경을 참조하고 있다.<br />
+따라서 익명함수의 lexical환경에서 y를 찾고, x를 찾지 못했다면 참조하고 있는 상위 lexical 환경에서 이 값을 찾는다.<br />
+결론적으로 console.log(add3(2));는 5를 출력한다.
 
 이처럼 함수가 생성될 당시의 외부 변수를 기억하고, 생성 이후에도 계속 접근이 가능하도록 함수와 함수가 선언된 lexical 환경의 조합을 closure라고 한다.
 
@@ -106,7 +107,8 @@ console.log(counter()); // 1
 console.log(counter()); // 2
 ```
 
-이 예제에서 makeCounter는 let counter에 익명함수를 return해주고 끝이 났다. 그렇지만 클로저에 의해 익명함수 외부 변수인 num값의 참조를 가지고 있기 때문에 이 값을 계속 읽고, 갱신할 수 있다.
+이 예제에서 makeCounter는 let counter에 익명함수를 return해주고 끝이 났다.<br />
+그렇지만 클로저에 의해 익명함수 외부 변수인 num값의 참조를 가지고 있기 때문에 이 값을 계속 읽고, 갱신할 수 있다.
 
 이처럼 클로저는 자신을 생성한 함수보다 더 오래 지속될 수 있다.
 
