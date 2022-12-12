@@ -1,51 +1,142 @@
-# prototype, getPrototypeOf, __proto__
+# 프로토타입(Prototype)
 
-상속은 객체지향 프로그래밍의 핵심 개념으로, 어떤 객체의 프로퍼티 또는 메서드를 다른 객체가 그대로 사용할 수 있는 것을 말한다. <br />
-JS의 클래스는 프로토타입을 기반으로 상속을 구현하여, 새로운 클래스 몇 개를 만들든 프로토타입을 통해 상속받은 프로퍼티들을 그대로 사용할 수 있어 불필요한 중복을 막을 수 있다. <br />
+프로토타입(`Object.prototype`)이란 객체이면서 동시에 다른 객체의 원형(프로토타입)이 되는 것을 말한다.<br />
+즉, 하위 객체에게 자신의 프로퍼티와 메서드를 상속해주기위한 역할을 수행하는 객체이며, JS는 이러한 프로토타입을 기반으로 상속을 구현한다.<br />
 
-### 프로토타입(prototype) 객체
-> 다른 객체에 공유 프로퍼티를 제공하는 객체이다.
+> 그렇다면 하위 객체에서 상속받은 부모 객체의 프로토타입은 어떻게 가지고 있을까?
 
-JS의 모든 객체는 [[Prototype]]이라는 내부 슬롯을 갖고 있다.<br />
-하지만 [[Prototype]]이라는 내부 슬롯에는 직접 접근이 불가능하다. 이는 프로토타입 체인의 단방향을 지키기 위해서다.<br />
-따라서 `__proto__` 프로퍼티 혹은 `Object.getPrototypeOf()`를 통해서만 접근할 수 있다.<br />
+### [[Prototype]]
 
-### __proto__와 getPrototypeOf
+JS의 모든 객체에는 [[Prototype]]이라는 내부 슬롯을 갖고 있으며, 자신의 원형인 부모 객체의 프로토타입을 가리키고 있다. <br />
+객체의 프로퍼티를 참조할 때 해당 프로퍼티가 객체에 없으면 객체의 프로토타입에서 찾는다. 프로토타입에도 없으면 더 위에 있는 프로토타입에서 찾는다.<br />
+이렇게 부모 프로퍼티를 찾아 올라가다보면 최상위에는 `Object` 프로토타입을 만날 수 있으며, 이것을 **프로토타입 체인**이라 한다.<br />
+JS는 이런 **프로토타입 체인**을 이용하여 상속과 확장을 구현한다. <br />
 
-모든 객체는 `__proto__`를 통해 자신의 프로토타입([[Prototype]])에 접근할 수 있다.<br />
-`__proto__`는 ES6 이전까지 비표준 메커니즘이었으나, ES6에서 표준으로 채택되었다.<br />
-하지만 여전히 코드 내에서 `__proto__`를 직접 호출하기 보다는 `Object.getPrototypeOf()`를 통해 프로토 타입에 접근하는 것을 권장한다. <br />
-이에 대해서는 뒷장에서 자세히 다뤄볼 예정이다.<br />
+하지만 [[Prototype]]이라는 내부 슬롯에는 직접 접근이 불가능하며, `__proto__`라는 프로퍼티 혹은 `Object.getPrototypeOf()` 메서드를 통해서만 접근할 수 있다.<br />
 
-### prototype 프로퍼티
-> 생성자 함수로 호출할 수 있는 객체, 즉 constructor를 소유하는 프로퍼티이다.
+### **proto**와 getPrototypeOf
 
-일반 객체와 생성자 함수로 호출할 수 없는 non-constructor에서는 `prototype` 프로퍼티가 없다.<br />
-또한 화살표 함수도 non-constructor로 `prototype` 프로퍼티가 없다.
+ES5에서 객체의 프로토타입을 가져오기 위한 표준 API로 `Object.getPrototypeOf()`메서드를 도입했지만, 많은 JS 엔진들은 이미 오랫동안 비표준 프로퍼티인 `__proto__`를 제공해 왔다. <br />
+`__proto__`는 `Object.getPrototypeOf()`가 가지지 않은 추가적인 기능을 제공하는데, 대표적으로 prototype 링크를 수정할 수 있다. <br />
+하지만 이 기능은 심각한 영향을 끼칠 수 있으므로 반드시 피해야한다.<br />
+
+먼저, 모든 플랫폼이 객체의 프로토타입 수정을 지원하지는 않기 때문에 이식성있는 코드를 작성할 수 없다.<br />
+또 다른 이유로는 성능 때문인데, `__proto__`를 수정하는 행위는 실제로 상속 구조 자체를 변경하는 행위이기 때문이다.<br />
+이는 JS 엔진을 통해 고도로 최적화 된 것들을 무효화하며, 관련된 모든 코드에 영향을 주기 때문에 실행가능한 가장 파괴적인 수정이라고도 한다.<br />
+하지만 `__proto__`를 수정하지 말아야 할 가장 큰 이유는 예측가능한 동작을 유지하기 위해서이다. <br />
+객체의 프로토타입 연결을 수정하는 것은 객체 전체의 상속 체계를 교체하는 것과 같기 때문에 혹자는 이를 두고 뇌를 교체하는 것과 마찬가지라고 표현한다.<br />
+기본적인 동작을 유지하기 위해서 상속 체계는 반드시 안정적인 상태를 유지해야 한다.<br />
+
+이러한 이유로 인해 더 안정적이고, 표준을 준수하는 API인 `Object.getPrototypeOf()` 메서드를 사용할 것을 권장한다. <br />
+
+### 정리
+
+- Prototype : 프로토타입 객체로 하위 객체에게 상속할 자신의 프로퍼티와 메서드가 정의되어 있다.
+- [[Prototype]] : 프로토타입 객체(원형인 부모 객체의 프로토타입)를 가리키는 내부 슬롯이다.
+- **proto** : 프로토타입에 접근하기 위한 비표준 접근자 프로퍼티로 [[Prototype]] 내부 슬롯에 간접적으로 접근 가능하게 한다.
+- getPrototypeOf() : ES5에서 제공해주는 객체의 프로토타입을 가져오기 위한 표준 API이다. (따라서 `__proto__`는 사용하지 말자.)
+
+<br />
+
+# 생성자가 new와 관계 없이 동작하게 만들어라
 
 ```
-// 함수 객체는 prototype 프로퍼티가 있다.
-function func() {}
-func.hasOwnProperty('prototype'); // output: true
-
-// 일반 객체는 prototype 프로퍼티가 없다.
-const obj = {};
-obj.hasOwnProperty('prototype'); // output: false
-
-// 화살표 함수 또한 prototype 프로퍼티가 없다.
-const arrowFunc = () => {};
-arrowFunc.hasOwnProperty('prototype'); // output: false
-```
-
-생성자 함수에 의해 생성된 객체는 constructor 프로퍼티를 통해 생성자 함수와 연결된다.
-
-```
-function Person(name) {
+function User(name, password) {
   this.name = name;
+  this.password = password;
 }
-const me = new Person('Mike'); // Person 생성자로 만들어진 me 객체
-me.constructor === Person; // output: true
+
+var u = User("Mike", "12345678"); // new 키워드 없이 호출
+u; // undefined
+this.name; // "Mike"
+this.password; // "12345678"
 ```
-즉, 프로토타입과 생성자 함수는 늘 함께 존재한다는 것을 알 수 있다. <br />
 
+위의 코드에서 호출자가 new 키워드를 깜빡한다면, 함수의 수신자 객체는 전역 객체가 된다. <br />
+이는 함수가 불필요하게 undefined를 반환할 뿐 아니라, 전역변수 name과 password를 생성(혹은 이미 존재한다면 값을 수정)한다. <br />
+이 함수를 더 견고하게 만들기 위해 우리는 어떻게 호출하더라도 생성자처럼 동작하는 함수를 제공해야한다.<br />
 
+가장 쉬운 방법은 수신자 객체의 값이 User의 적절한 인스턴스인지 확인하는 것이다.<br />
+
+```
+function User(name, password) {
+  if (!(this instanceof User)) { // 수신자 객체의 인스턴스 확인
+    return new User(name, password);
+  }
+  this.name = name;
+  this.password = password;
+}
+```
+
+이 방법을 사용하면, 함수로 호출되든지 생성자로 호출되든지 상관없이 User를 호출한 결과는 User.prototype을 상속한 객체가 된다.<br />
+다만 이 패턴의 한 가지 단점은 추가적인 함수 호출이 필요하기 때문에 약간 더 비용이 많이 든다는 점이다. <br />
+
+다른 방법으로 ES5의 `Object.create()`를 사용할 수도 있다.<br />
+`Object.create()`는 프로토타입 객체를 받아 이를 상속받는 새로운 객체를 반환한다.<br />
+
+```
+function User(name, password) {
+  var self = this instanceof User
+    ? this
+    : Object.create(User.prototype);
+    self.name = name;
+    self.password = password;
+    return self;
+}
+```
+
+User가 함수로 호출되면, 그 결과는 User.prototype을 상속하고 초기화된 name과 password 프로퍼티를 가지는 새로운 객체가 된다.<br />
+new를 통해 User를 호출하면 생성자는 오버라이딩된다. JS는 생성자 함수 내에서 명시적으로 return을 실행할 경우 new 표현식의 결과를 오버라이딩하도록 허용하기 때문이다.<br />
+
+이렇게 생성자의 오용을 방지하는 것이 문제에 항상 도움이 되는 것은 아니다. <br />
+특히 방대한 코드 전반에 걸쳐 공유되거나 공유 라이브러리로 사용되는 경우 생성자 함수는 new를 통해 호출되어야 함을 문서화해야 한다.<br />
+
+<br />
+
+# 메서드를 츠로토타입에 저장하라
+
+JS에서 프로토타입을 쓰지 않고 프로그램을 작성하고, 동작하게 하는 것은 가능하다.
+
+```
+function User(name, password) {
+  this.name = name;
+  this.password = password;
+  this.toString = function() {
+    return "[User " + this.name + "]";
+  };
+  this.checkPassword = function(password) {
+    return password === this.password;
+  }
+}
+```
+
+대부분의 경우 이 클래스틑 원래의 구현과 꽤 비슷하게 동작한다. 하지만 User의 인스턴스를 여러 개 만든다면 중요한 차이점이 생긴다. <br />
+
+```
+var u1 = new User(...);
+var u2 = new User(...);
+var u3 = new User(...);
+```
+
+이 세 객체와 프로토타입 객체는 다음의 그림 4.3과 같다.<br />
+
+![prototype](./img/prototype.jpg)
+
+toString과 checkPassword를 프로토타입으로 공유하는 대신, 각 인스턴스는 두 메서드를 복사하여 가지고 있으므로, 총 여섯 개의 함수 객체가 저장된다.<br />
+이와 대조적으로 그림 4.4는 프로토타입을 사용했을 때의 모습을 보여준다. <br />
+toString과 checkPassword 메서드는 한 번 생성되고 프로토타입을 통해 모든 인스턴스에 공유된다.<br />
+
+이처럼 프로토타입에 메서드를 저장하면 개별 인스턴스 객체에 부가적인 프로퍼티를 추가하거나 여러 개의 함수를 복사할 필요 없이, 모든 인스턴스에서 사용할 수 있다.<br />
+
+> 각 인스턴스에 메서드를 복사해서 가지고 있으면 메서드의 구현체를 찾기 위해 프로토타입 체인을 뒤질 필요가 없어서 탐색에 걸리는 시간을 최적화 시킬 수 있지 않을까?
+
+최신 JS 엔진은 프로토타입 탐색을 고도로 최적화한다. 왜냐하면 프로토타입 탐색은 JS 프로그램이 수행하는 가장 일반적인 연산 중 하나이기 때문이다. <br />
+따라서 인스턴스 객체에 메서드를 복사하는 것이 눈에 띌 만한 속도 개선을 반드시 보장하지는 않는다. <br />
+또, 인스턴스 메서드는 프로토타입 메서드에 비해 더 많은 메모리를 사용하는 것이 거의 확실하다. <br />
+따라서 인스턴스 객체에 메서드를 저장하기보다 프로토타입에 메서드를 저장하는 것이 좋다. <br />
+
+<br />
+
+# 비공개 데이터를 저장하기 위해 클로저를 사용하라
+
+<br />
