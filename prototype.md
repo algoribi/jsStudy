@@ -120,7 +120,7 @@ var u3 = new User(...);
 
 이 세 객체와 프로토타입 객체는 다음의 그림 4.3과 같다.<br />
 
-<img src="/img/prototype.jpg" width="800" height="800">
+<img src="/img/prototype.jpg" width="600" height="800">
 
 toString과 checkPassword를 프로토타입으로 공유하는 대신, 각 인스턴스는 두 메서드를 복사하여 가지고 있으므로, 총 여섯 개의 함수 객체가 저장된다.<br />
 이와 대조적으로 그림 4.4는 프로토타입을 사용했을 때의 모습을 보여준다. <br />
