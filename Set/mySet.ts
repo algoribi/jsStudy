@@ -1,32 +1,63 @@
-class MySet {
-  constructor() {
-    this.items = {};
+class MySet<T> {
+  private items: T[];
+
+  constructor(items?: T[]) {
+    if (items === undefined) {
+      this.items = [];
+    } else {
+    this.items = items;
+    }
   }
-  has(value) {
-    return this.items.hasOwnProperty(value);
-    // hasOwnProperty -> 객체가 특정 프로퍼티를 가지고 있는지를 나타내는 불리언 값을 반환한다
-  }
-  add(value) {
-    if (!this.has(value)) {
-      this.items[value] = value; // 키 - 값 쌍을 동일하게 저장해야 값을 찾기 편하다
+
+  add(element : T) {
+    if (!this.has(element)) {
+      this.items.push(element);
       return true;
     }
     return false;
   }
-  remove(value) {
-    if (this.has(value)) {
-      delete this.items[value];
+
+  delete(element: T) {
+    const idx = this.items.indexOf(element);
+    if (idx > -1) {
+      this.items.splice(idx, 1);
       return true;
     }
     return false;
   }
+
+  has(element: T) {
+    if (this.items.indexOf(element) > -1) {
+      return true;
+    }
+    return false;
+  }
+
   clear() {
-    this.items = {};
+    this.items = [];
+    return undefined;
   }
+
   size() {
-    return Object.keys(this.items).length;
+    return this.items.length;
   }
+  
+  isEmpty() {
+    if (this.items.length === 0) {
+      return true;
+    }
+    return false;
+  }
+
   values() {
-    return Object.keys(this.items);
+    return Array.from(this.items);
   }
 }
+
+const test = new MySet<string>();
+test.add("hello");
+test.add("test");
+test.add("world");
+
+const tt = test.values();
+console.log(test);
