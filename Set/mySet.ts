@@ -1,64 +1,63 @@
-class MySet {
-  private items : { [key : string] : string};
+class MySet<T> {
+  private items: T[];
+  private current: number = 0;
 
   constructor() {
-    this.items = {};
+    this.items = [];
   }
 
-  add(element : string) {
+  add(element : T) {
     if (!this.has(element)) {
-      this.items[element] = element;
+      this.items.push(element);
       return true;
     }
     return false;
   }
 
-  delete(element : string) {
-    if (this.has(element)) {
-      delete this.items[element];
+  delete(element: T) {
+    const idx = this.items.indexOf(element);
+    if (idx > -1) {
+      this.items.splice(idx, 1);
       return true;
     }
     return false;
   }
 
-  has(element : string) {
-    return Object.prototype.hasOwnProperty.call(this.items, element);
-  }
-
-  values() {
-    return Object.values(this.items);
-  }
-
-  isEmpty() {
-    return this.size() === 0;
-  }
-
-  size() {
-    return Object.keys(this.items).length;
+  has(element: T) {
+    if (this.items.indexOf(element) > -1) {
+      return true;
+    }
+    return false;
   }
 
   clear() {
-    this.items = {};
+    this.items = [];
+    return undefined;
   }
 
-  iterate() {
-    
+  size() {
+    return this.items.length;
+  }
+
+  isEmpty() {
+    if (this.items.length === 0) {
+      return true;
+    }
+    return false;
+  }
+
+  values() {
+    return Array.from(this.items);
+  }
+
+  iterator() {
+    return {
+      next: () =>  this.current >= this.size() ? undefined : this.items[this.current++],
+      [Symbol.iterator]() { return this }
+    }
+  }
+
+  resetIterator() {
+    this.current = 0;
   }
 }
-
-// const test = new MySet<string>();
-// test.add("hello");
-// test.add("test");
-// test.add("world");
-
-const t = new Set<string>();
-const tt = new MySet();
-tt.add("hello");
-tt.add("hello");
-tt.add("world");
-
-console.log("test : ", t);
-// console.log(t["string"]);
-
-// const tt = test.values();
-// console.log(test);
