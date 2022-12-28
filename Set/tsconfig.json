@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  },
+  "ts-node": {
+    "esm": true
+  }
+}
