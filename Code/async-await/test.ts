@@ -1,22 +1,22 @@
 import { asyncMap, asyncFilter, asyncForEach } from "./asyncCallbackArrayMethods.js";
 
 const sleep = (ms: number) => {
-  return new Promise((resolve, _) => setTimeout(resolve, ms));
+  return new Promise((resolve, _) => setTimeout(resolve, ms * 1000));
 }
 
 const throwErrorSleep = (ms: number) => {
     if (ms === 1) {
         return new Promise((_, reject) => reject("reject!"));
     }
-  return new Promise((resolve, _) => setTimeout(resolve, ms));
+  return new Promise((resolve, _) => setTimeout(resolve, ms * 1000));
 }
 
 const asyncMapTest = async () => {
 
     const arr = [1, 2, 3];
 
-    const mapper1 = async (i: number) => { await sleep(i); return i; };
-    const mapper2 = async (i: number) => { await throwErrorSleep(i); return i; };
+    const mapper1 = async (item: number) => { await sleep(item); return item; };
+    const mapper2 = async (item: number) => { await throwErrorSleep(item); return item; };
 
     // asyncMap
     const mapArray1 = await asyncMap(arr, mapper1);
@@ -35,8 +35,8 @@ const asyncMapTest = async () => {
 const asyncFilterTest = async () => {
   const arr = [1, 2, 3, 4];
 
-  const predicate1 = async (i : number) => { await sleep(i); return i % 2 === 0; };
-  const predicate2 = async (i : number) => { await throwErrorSleep(i); return i % 2 === 0; };
+  const predicate1 = async (item: number) => { await sleep(item); return item % 2 === 0; };
+  const predicate2 = async (item : number) => { await throwErrorSleep(item); return item % 2 === 0; };
 
   // asyncFilter
   const filterArray1 = await asyncFilter(arr, predicate1);
@@ -48,9 +48,16 @@ const asyncFilterTest = async () => {
 }
 
 const asyncForEachTest = async () => {
+  const arr = [1, 2, 3, 4];
 
+  let sum1 = 0;
+  const callback1 = async (item: number, index: number) => { await sleep(index); sum1 += item; console.log(index); };
+
+  // asyncFilter
+  await asyncForEach(arr, callback1); // 0 1 2 3
+  console.log(sum1); // 10
 }
 
-// asyncMapTest();
-// asyncFilterTest();
+asyncMapTest();
+asyncFilterTest();
 asyncForEachTest();
