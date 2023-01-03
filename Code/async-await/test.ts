@@ -1,4 +1,4 @@
-import { pMap, pFilter, pForEach } from "./asyncCallbackArrayMethods.js";
+import { asyncMap, asyncFilter, asyncForEach } from "./asyncCallbackArrayMethods.js";
 
 const sleep = (ms: number) => {
   return new Promise((resolve, _) => setTimeout(resolve, ms));
@@ -11,19 +11,19 @@ const throwErrorSleep = (ms: number) => {
   return new Promise((resolve, _) => setTimeout(resolve, ms));
 }
 
-const test = async () => {
+const asyncMapTest = async () => {
 
     const arr = [1, 2, 3];
 
     const mapper1 = async (i: number) => { await sleep(i); return i; };
     const mapper2 = async (i: number) => { await throwErrorSleep(i); return i; };
 
-    // pMap
-    const mapArray1 = await pMap(arr, mapper1);
+    // asyncMap
+    const mapArray1 = await asyncMap(arr, mapper1);
     console.log(mapArray1); // [ 1, 2, 3]
 
     // enforce option : true
-    const mapArray2 = await pMap(arr, mapper2, true);
+    const mapArray2 = await asyncMap(arr, mapper2, true);
     console.log(mapArray2);
     // [
     //   { status: 'rejected', reason: 'reject!' },
@@ -32,4 +32,25 @@ const test = async () => {
     // ]
 }
 
-test();
+const asyncFilterTest = async () => {
+  const arr = [1, 2, 3, 4];
+
+  const predicate1 = async (i : number) => { await sleep(i); return i % 2 === 0; };
+  const predicate2 = async (i : number) => { await throwErrorSleep(i); return i % 2 === 0; };
+
+  // asyncFilter
+  const filterArray1 = await asyncFilter(arr, predicate1);
+  console.log(filterArray1); // [2, 4]
+
+  // enforce option : true
+  const filterArray2 = await asyncFilter(arr, predicate2, true);
+  console.log(filterArray2); // [2, 4]
+}
+
+const asyncForEachTest = async () => {
+
+}
+
+// asyncMapTest();
+// asyncFilterTest();
+asyncForEachTest();
